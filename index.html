@@ -14,7 +14,7 @@
     }
 
     text {
-      font: 24px "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font: 32px "Helvetica Neue", Helvetica, Arial, sans-serif;
       text-anchor: middle;
     }
 
@@ -22,13 +22,18 @@
 
   </head>
   <body>
-
+  <h1>Animal Crossing Fish Prices</h1>
+  
+  <h2>Sea Fish</h2>
   <svg id="svg-sea" width="1000" height="1000"></svg>
 
+  <h2>River Fish</h2>
   <svg id="svg-river" width="1000" height="1000"></svg>
 
+  <h2>Pond Fish</h2>
   <svg id="svg-pond" width="1000" height="1000"></svg>
 
+  <h2>Pier Fish</h2>
   <svg id="svg-pier" width="1000" height="1000"></svg>
 
   <script src="https://d3js.org/d3.v7.min.js"></script>
@@ -47,6 +52,17 @@
      async function handleData() {
       const data = await d3.csv('fish.csv')
 
+      const tooltip = d3.select('body')
+        .append('div')
+        .style("position", "absolute")
+        .style("z-index", "10")
+        .style("visibility", "hidden")
+        .style('background-color', 'black')
+        .style('color', 'white')
+        .style('font-family', 'helvetica')
+
+      const num_f = d3.format('.2s')
+
       const colorScale = d3
         .scaleSequential(d3.interpolateRainbow)
         .domain(d3.extent(data, d => d.Sell))
@@ -64,17 +80,17 @@
 
       const seaRootNode = pack(seaRoot)
 
-      const tooltip = d3.select('body')
-        .append('div')
-        .style("position", "absolute")
-        .style("z-index", "10")
-        .style("visibility", "hidden")
-        .text('tooltip')
 
       const seaNodes = d3.select('#svg-sea')
         .selectAll('g')
         .data(seaRootNode.leaves())
         .join('g')
+        .on("mouseover", (e,d) => { 
+          console.log(d) 
+          tooltip.style("visibility", "visible")
+          tooltip.text(d.data.Name)})
+        .on("mousemove", function(){return tooltip.style("top", (event.pageY-10)+"px").style("left",(event.pageX+10)+"px");})
+        .on("mouseout", function(){return tooltip.style("visibility", "hidden");});
 
       seaNodes
         .attr('transform', d => `translate(${d.x}, ${d.y})`)
@@ -83,13 +99,10 @@
         .attr('fill', d => {
           return colorScale(d.data.Sell)
         })
-        .on("mouseover", function(){return tooltip.style("visibility", "visible");})
-        .on("mousemove", function(){return tooltip.style("top", (event.pageY-10)+"px").style("left",(event.pageX+10)+"px");})
-        .on("mouseout", function(){return tooltip.style("visibility", "hidden");});
 
       seaNodes
         .append('text')
-        .text( d => d.data.Name )
+        .text( d => num_f(d.data.Sell))
         .style("font-size", function(d) { return Math.min(2 * d.r, (2 * d.r - 8) / this.getComputedTextLength() * 24) + "px"; })
         .style('alignment-baseline', 'middle')
         .style('fill', 'white')
@@ -108,6 +121,12 @@
         .selectAll('g')
         .data(riverRootNode.leaves())
         .join('g')
+        .on("mouseover", (e,d) => { 
+          console.log(d) 
+          tooltip.style("visibility", "visible")
+          tooltip.text(d.data.Name)})
+        .on("mousemove", function(){return tooltip.style("top", (event.pageY-10)+"px").style("left",(event.pageX+10)+"px");})
+        .on("mouseout", function(){return tooltip.style("visibility", "hidden");});
 
       riverNodes
         .attr('transform', d => `translate(${d.x}, ${d.y})`)
@@ -119,7 +138,7 @@
 
       riverNodes
         .append('text')
-        .text( d => d.data.Name )
+        .text( d => num_f(d.data.Sell))
         .style("font-size", function(d) { return Math.min(2 * d.r, (2 * d.r - 8) / this.getComputedTextLength() * 24) + "px"; })
         .style('alignment-baseline', 'middle')
         .style('fill', 'white')
@@ -138,6 +157,12 @@
         .selectAll('g')
         .data(pondRootNode.leaves())
         .join('g')
+        .on("mouseover", (e,d) => { 
+          console.log(d) 
+          tooltip.style("visibility", "visible")
+          tooltip.text(d.data.Name)})
+        .on("mousemove", function(){return tooltip.style("top", (event.pageY-10)+"px").style("left",(event.pageX+10)+"px");})
+        .on("mouseout", function(){return tooltip.style("visibility", "hidden");});
 
       pondNodes
         .attr('transform', d => `translate(${d.x}, ${d.y})`)
@@ -149,7 +174,7 @@
 
       pondNodes
         .append('text')
-        .text( d => d.data.Name )
+        .text( d => num_f(d.data.Sell))
         .style("font-size", function(d) { return Math.min(2 * d.r, (2 * d.r - 8) / this.getComputedTextLength() * 24) + "px"; })
         .style('alignment-baseline', 'middle')
         .style('fill', 'white')
@@ -168,6 +193,12 @@
         .selectAll('g')
         .data(pierRootNode.leaves())
         .join('g')
+        .on("mouseover", (e,d) => { 
+          console.log(d) 
+          tooltip.style("visibility", "visible")
+          tooltip.text(d.data.Name)})
+        .on("mousemove", function(){return tooltip.style("top", (event.pageY-10)+"px").style("left",(event.pageX+10)+"px");})
+        .on("mouseout", function(){return tooltip.style("visibility", "hidden");});
 
       pierNodes
         .attr('transform', d => `translate(${d.x}, ${d.y})`)
@@ -179,7 +210,7 @@
 
       pierNodes
         .append('text')
-        .text( d => d.data.Name )
+        .text( d => num_f(d.data.Sell))
         .style("font-size", function(d) { return Math.min(2 * d.r, (2 * d.r - 8) / this.getComputedTextLength() * 24) + "px"; })
         .style('alignment-baseline', 'middle')
         .style('fill', 'white')
