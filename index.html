@@ -12,48 +12,104 @@
       justify-content: center;
       align-items: center;
     }
+
+    text {
+      font: 24px "Helvetica Neue", Helvetica, Arial, sans-serif;
+      text-anchor: middle;
+    }
+
   </style>
 
   </head>
   <body>
 
-  <svg id="svg-sea" width="600" height="600"></svg>
+  <svg id="svg-sea" width="1000" height="1000"></svg>
 
-  <svg id="svg-river" width="600" height="600"></svg>
+  <svg id="svg-river" width="1000" height="1000"></svg>
 
-  <svg id="svg-pond" width="600" height="600"></svg>
+  <svg id="svg-pond" width="1000" height="1000"></svg>
 
-  <svg id="svg-pier" width="600" height="600"></svg>
+  <svg id="svg-pier" width="1000" height="1000"></svg>
 
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script>
+
+    function getDataForWhere(data, Where) {
+        const arr = data
+          .filter(d => d.Where === Where)
+          .map(d => {
+            d.Sell = parseFloat(d.Sell)
+            return d
+          })
+        return arr
+      }
+
      async function handleData() {
       const data = await d3.csv('fish.csv')
-      const width = 600
-      const height = 600
-      const margin = 40 
 
       const colorScale = d3
         .scaleSequential(d3.interpolateRainbow)
         .domain(d3.extent(data, d => d.Sell))
 
-      const num_f = d3.format(".2s")
+      const pack = d3.pack()
+        .size([1000, 1000])
+        .padding(5)
 
-      const root = d3.hierarchy({ children: data })
+      // Sea Fish ---------------------------------------------
+
+      const seaData = getDataForWhere(data, 'Sea')
+
+      const seaRoot = d3.hierarchy({ children: seaData })
         .sum(d => d.Sell)
 
-      const pack = d3.pack()
-        .size([600, 600])
-        .padding(20)
+      const seaRootNode = pack(seaRoot)
 
-      const rootNode = pack(root)
+      const tooltip = d3.select('body')
+        .append('div')
+        .style("position", "absolute")
+        .style("z-index", "10")
+        .style("visibility", "hidden")
+        .text('tooltip')
 
-      // Sea Fish
-
-      d3.select('#svg-sea')
+      const seaNodes = d3.select('#svg-sea')
         .selectAll('g')
-        .data(rootNode.leaves())
+        .data(seaRootNode.leaves())
         .join('g')
+
+      seaNodes
+        .attr('transform', d => `translate(${d.x}, ${d.y})`)
+        .append('circle')
+        .attr('r', d => d.r)
+        .attr('fill', d => {
+          return colorScale(d.data.Sell)
+        })
+        .on("mouseover", function(){return tooltip.style("visibility", "visible");})
+        .on("mousemove", function(){return tooltip.style("top", (event.pageY-10)+"px").style("left",(event.pageX+10)+"px");})
+        .on("mouseout", function(){return tooltip.style("visibility", "hidden");});
+
+      seaNodes
+        .append('text')
+        .text( d => d.data.Name )
+        .style("font-size", function(d) { return Math.min(2 * d.r, (2 * d.r - 8) / this.getComputedTextLength() * 24) + "px"; })
+        .style('alignment-baseline', 'middle')
+        .style('fill', 'white')
+      
+
+      // River Fish ---------------------------------------------
+
+      const riverData = getDataForWhere(data, 'River')
+
+      const riverRoot = d3.hierarchy({ children: riverData })
+        .sum(d => d.Sell)
+
+      const riverRootNode = pack(riverRoot)
+
+      const riverNodes = d3.select('#svg-river')
+        .selectAll('g')
+        .data(riverRootNode.leaves())
+        .join('g')
+
+      riverNodes
         .attr('transform', d => `translate(${d.x}, ${d.y})`)
         .append('circle')
         .attr('r', d => d.r)
@@ -61,20 +117,75 @@
           return colorScale(d.data.Sell)
         })
 
-      d3.select('#svg-sea')
-        .selectAll('g')
-        .data(rootNode.leaves())
-        .join('g')
+      riverNodes
         .append('text')
         .text( d => d.data.Name )
-        .attr('font-family', 'Helvetica')
-        .style('text-anchor', 'middle')
+        .style("font-size", function(d) { return Math.min(2 * d.r, (2 * d.r - 8) / this.getComputedTextLength() * 24) + "px"; })
         .style('alignment-baseline', 'middle')
-        // .style('mix-blend-mode', 'difference')
         .style('fill', 'white')
 
-    }
+
+      // Pond Fish ---------------------------------------------
+
+      const pondData = getDataForWhere(data, 'Pond')
+
+      const pondRoot = d3.hierarchy({ children: pondData })
+        .sum(d => d.Sell)
+
+      const pondRootNode = pack(pondRoot)
+
+      const pondNodes = d3.select('#svg-pond')
+        .selectAll('g')
+        .data(pondRootNode.leaves())
+        .join('g')
+
+      pondNodes
+        .attr('transform', d => `translate(${d.x}, ${d.y})`)
+        .append('circle')
+        .attr('r', d => d.r)
+        .attr('fill', d => {
+          return colorScale(d.data.Sell)
+        })
+
+      pondNodes
+        .append('text')
+        .text( d => d.data.Name )
+        .style("font-size", function(d) { return Math.min(2 * d.r, (2 * d.r - 8) / this.getComputedTextLength() * 24) + "px"; })
+        .style('alignment-baseline', 'middle')
+        .style('fill', 'white')
+
+
+      // Pier Fish ---------------------------------------------
+
+      const pierData = getDataForWhere(data, 'Pier')
+
+      const pierRoot = d3.hierarchy({ children: pierData })
+        .sum(d => d.Sell)
+
+      const pierRootNode = pack(pierRoot)
+
+      const pierNodes = d3.select('#svg-pier')
+        .selectAll('g')
+        .data(pierRootNode.leaves())
+        .join('g')
+
+      pierNodes
+        .attr('transform', d => `translate(${d.x}, ${d.y})`)
+        .append('circle')
+        .attr('r', d => d.r)
+        .attr('fill', d => {
+          return colorScale(d.data.Sell)
+        })
+
+      pierNodes
+        .append('text')
+        .text( d => d.data.Name )
+        .style("font-size", function(d) { return Math.min(2 * d.r, (2 * d.r - 8) / this.getComputedTextLength() * 24) + "px"; })
+        .style('alignment-baseline', 'middle')
+        .style('fill', 'white')
     
+    }
+
     handleData()
   </script>
 
