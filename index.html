@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <title>Animal Crossing Fish</title>
+
+  <style>
+    /* Put the box in the center of the page */
+    body, html {
+      /* height: 100%; */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+  </style>
+
+  </head>
+  <body>
+
+  <svg id="svg-sea" width="600" height="600"></svg>
+
+  <svg id="svg-river" width="600" height="600"></svg>
+
+  <svg id="svg-pond" width="600" height="600"></svg>
+
+  <svg id="svg-pier" width="600" height="600"></svg>
+
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script>
+     async function handleData() {
+      const data = await d3.csv('fish.csv')
+      const width = 600
+      const height = 600
+      const margin = 40 
+
+      const colorScale = d3
+        .scaleSequential(d3.interpolateRainbow)
+        .domain(d3.extent(data, d => d.Sell))
+
+      const num_f = d3.format(".2s")
+
+      const root = d3.hierarchy({ children: data })
+        .sum(d => d.Sell)
+
+      const pack = d3.pack()
+        .size([600, 600])
+        .padding(20)
+
+      const rootNode = pack(root)
+
+      // Sea Fish
+
+      d3.select('#svg-sea')
+        .selectAll('g')
+        .data(rootNode.leaves())
+        .join('g')
+        .attr('transform', d => `translate(${d.x}, ${d.y})`)
+        .append('circle')
+        .attr('r', d => d.r)
+        .attr('fill', d => {
+          return colorScale(d.data.Sell)
+        })
+
+      d3.select('#svg-sea')
+        .selectAll('g')
+        .data(rootNode.leaves())
+        .join('g')
+        .append('text')
+        .text( d => d.data.Name )
+        .attr('font-family', 'Helvetica')
+        .style('text-anchor', 'middle')
+        .style('alignment-baseline', 'middle')
+        // .style('mix-blend-mode', 'difference')
+        .style('fill', 'white')
+
+    }
+    
+    handleData()
+  </script>
+
+  </body>
