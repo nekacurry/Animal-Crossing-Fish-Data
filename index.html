@@ -11,10 +11,11 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
+      font: 32px "Helvetica Neue", Helvetica, Arial, sans-serif;
+      color:salmon;
     }
 
     text {
-      font: 32px "Helvetica Neue", Helvetica, Arial, sans-serif;
       text-anchor: middle;
     }
 
@@ -57,9 +58,11 @@
         .style("position", "absolute")
         .style("z-index", "10")
         .style("visibility", "hidden")
-        .style('background-color', 'black')
-        .style('color', 'white')
+        .style('color', 'text')
         .style('font-family', 'helvetica')
+        .style('padding', '10px')
+        .style('background-color', 'white')
+
 
       const num_f = d3.format('.2s')
 
